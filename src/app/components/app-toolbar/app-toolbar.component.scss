@@ -1,0 +1,41 @@
+:host {
+
+  mat-toolbar {
+    display: flex;
+    align-items: center;
+    height: 96px;
+  }
+
+  .app-logo {
+    height: 40px;
+    margin-right: 10px;
+    filter: invert(1);
+  }
+
+  .app-name {
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .spacer {
+    flex: 1;
+    margin: 0 20px;
+    display: flex;
+    justify-content: end;
+  }
+
+  .dropdown {
+    width: 200px;
+    margin-left: 10px;
+  }
+
+  mat-form-field ::ng-deep.mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+    height: 0 !important;
+    padding: 0 !important;
+  }
+
+
+}
+
+

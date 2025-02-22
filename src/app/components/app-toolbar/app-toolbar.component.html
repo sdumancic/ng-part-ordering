@@ -1,0 +1,32 @@
+<mat-toolbar color="primary">
+  <!-- Application Logo -->
+  <img src="/orders.png" alt="Orders Logo" class="app-logo"/>
+
+  <!-- Application Name -->
+  <span class="app-name">Parts Ordering</span>
+
+  <div class="spacer">
+    <button mat-button color="secondary" [disabled]="!selectedDealer()">Overview</button>
+    <button mat-button color="secondary" [disabled]="!selectedDealer()">New Order</button>
+  </div>
+
+  <!-- Dealer Selection -->
+  <mat-form-field appearance="outline" class="dropdown">
+    <mat-label>Dealer</mat-label>
+    <mat-select [value]="selectedDealer()" (selectionChange)="dealerSelected.emit($event.value)">
+      <mat-option *ngFor="let dealer of dealers()" [value]="dealer">
+        {{ dealer.name }} ({{ dealer.number }})
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Language Selection -->
+  <mat-form-field appearance="outline" class="dropdown">
+    <mat-label>Language</mat-label>
+    <mat-select [value]="selectedLanguage()" (selectionChange)="languageSelected.emit($event.value)">
+      <mat-option *ngFor="let lang of languages()" [value]="lang">
+        {{ lang }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</mat-toolbar>
