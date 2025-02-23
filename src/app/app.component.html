@@ -1,12 +1,2 @@
-<app-toolbar
-  [dealers]="store.dealers()"
-  [languages]="store.languages()"
-  [selectedDealer]="store.selectedDealer()"
-  [selectedLanguage]="store.selectedLanguage()"
-  (dealerSelected)="store.changeDealer($event)"
-  (languageSelected)="store.changeLanguage($event)"
-></app-toolbar>
 <router-outlet/>
-@if (store.isBusy()) {
-  <app-busy-indicator/>
-}
+

@@ -1,0 +1,12 @@
+<app-toolbar
+  [dealers]="store.dealers()"
+  [languages]="store.languages()"
+  [selectedDealer]="store.selectedDealer()"
+  [selectedLanguage]="store.selectedLanguage()"
+  (dealerSelected)="store.changeDealer($event)"
+  (languageSelected)="store.changeLanguage($event)"
+  [caption]="store.translate('caption')"
+></app-toolbar>
+@if (store.isBusy()) {
+  <app-busy-indicator/>
+}

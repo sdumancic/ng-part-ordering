@@ -5,10 +5,11 @@ import { MatToolbarModule } from '@angular/material/toolbar'
 import { CommonModule } from '@angular/common'
 import { MatButton } from '@angular/material/button'
 import { Dealer } from '../../models/dealer.model'
+import { RouterLink } from '@angular/router'
 
 @Component({
   selector: 'app-toolbar',
-  imports: [CommonModule, MatToolbarModule, MatSelectModule, MatFormFieldModule, MatButton],
+  imports: [CommonModule, MatToolbarModule, MatSelectModule, MatFormFieldModule, MatButton, RouterLink],
   templateUrl: './app-toolbar.component.html',
   styleUrl: './app-toolbar.component.scss'
 })
@@ -17,6 +18,7 @@ export class AppToolbarComponent {
   readonly selectedLanguage = input<string>()
   readonly dealers = input<Dealer[]>()
   readonly languages = input<string[]>()
+  readonly caption = input<string>()
 
   @Output() dealerSelected = new EventEmitter<Dealer>()
   @Output() languageSelected = new EventEmitter<string>()

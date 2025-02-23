@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { delay, Observable, of, tap } from 'rxjs'
+import { delay, Observable, of, switchMap, tap, throwError } from 'rxjs'
 import { ALL_TRANSLATIONS } from '../data/translations'
 
 @Injectable({ providedIn: 'root' })
@@ -9,12 +9,13 @@ export class TranslationService {
     let newVar = ALL_TRANSLATIONS[language]
     return of(newVar).pipe(
       tap(_ => console.log('fetching translations')),
-      delay(750),
+      delay(400),
+      switchMap(_ => throwError(() => 'Translations not found')),
       tap(translations => console.log('translations fetched ', translations))
     )
   }
 
-  getTranslation (language: string, key: string): string {
-    return ALL_TRANSLATIONS[language][key] || key
+  getTranslation (language: string | undefined, key: string): string {
+    return language == undefined ? key : ALL_TRANSLATIONS[language][key] || key
   }
 }

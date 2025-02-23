@@ -3,11 +3,15 @@
   <img src="/orders.png" alt="Orders Logo" class="app-logo"/>
 
   <!-- Application Name -->
-  <span class="app-name">Parts Ordering</span>
+  <span class="app-name">{{ caption() }}</span>
 
   <div class="spacer">
-    <button mat-button color="secondary" [disabled]="!selectedDealer()">Overview</button>
-    <button mat-button color="secondary" [disabled]="!selectedDealer()">New Order</button>
+    <button
+      mat-button color="secondary" [disabled]="!selectedDealer() || !selectedLanguage()"
+      [routerLink]="['/orders-overview']"
+    >Overview
+    </button>
+    <button mat-button color="secondary" [disabled]="!selectedDealer() || !selectedLanguage()">New Order</button>
   </div>
 
   <!-- Dealer Selection -->

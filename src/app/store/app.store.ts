@@ -9,6 +9,8 @@ import { Dealer } from '../models/dealer.model'
 import { withDevtools } from '@angular-architects/ngrx-toolkit'
 import { rxMethod } from '@ngrx/signals/rxjs-interop'
 import { TranslationService } from '../services/translation.service'
+import { NotificationService } from '../services/notification.service'
+import { tapResponse } from '@ngrx/operators'
 
 export const AppStore = signalStore(
   { providedIn: 'root' },
@@ -17,10 +19,12 @@ export const AppStore = signalStore(
     const _dealerService = inject(DealersService)
     const _languageService = inject(LanguageService)
     const _translationService = inject(TranslationService)
+    const _notificationService = inject(NotificationService)
     return {
       _dealerService,
       _languageService,
-      _translationService
+      _translationService,
+      _notificationService
     }
   }),
   withMethods(store => {
@@ -59,7 +63,13 @@ export const AppStore = signalStore(
       }),
       switchMap(language => store._translationService.fetchTranslations$(language)
         .pipe(
-          tap(translations => patchState(store, setTranslations(translations), setBusy(false)))
+          tapResponse({
+            next: (translations) => patchState(store, setTranslations(translations), setBusy(false)),
+            error: (err) => {
+              store._notificationService.error(`${err}`)
+              patchState(store, setBusy(false))
+            }
+          })
         ))
     ))
 
@@ -70,7 +80,9 @@ export const AppStore = signalStore(
       changeLanguage: (language: string) => {
         return _fetchTranslations(language)
       },
-
+      translate: (key: string) => {
+        return store._translationService.getTranslation(store.selectedLanguage(), key)
+      },
       fetchDealers: async () => {
         await _fetchDealers()
       },
