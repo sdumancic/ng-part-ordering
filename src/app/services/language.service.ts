@@ -8,7 +8,7 @@ export class LanguageService {
   fetchLanguages$ (): Observable<string[]> {
     return of(ALL_LANGUAGES).pipe(
       tap(_ => console.log(`Started loading languages`)),
-      delay(500),
+      delay(200),
       tap(_ => console.log(`Finished loading languages`)),
     )
   }

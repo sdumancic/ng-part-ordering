@@ -1,6 +1,6 @@
-import { patchState, signalStore, withMethods, withProps, withState } from '@ngrx/signals'
+import { patchState, signalStore, withComputed, withMethods, withProps, withState } from '@ngrx/signals'
 import { initialAppSlice } from './app.slice'
-import { inject } from '@angular/core'
+import { computed, inject } from '@angular/core'
 import { DealersService } from '../services/dealers.service'
 import { LanguageService } from '../services/language.service'
 import { firstValueFrom, forkJoin, switchMap, tap } from 'rxjs'
@@ -11,6 +11,7 @@ import { rxMethod } from '@ngrx/signals/rxjs-interop'
 import { TranslationService } from '../services/translation.service'
 import { NotificationService } from '../services/notification.service'
 import { tapResponse } from '@ngrx/operators'
+import { buildAppVm } from './app-vm.builder'
 
 export const AppStore = signalStore(
   { providedIn: 'root' },
@@ -25,6 +26,12 @@ export const AppStore = signalStore(
       _languageService,
       _translationService,
       _notificationService
+    }
+  }),
+  withComputed((store) => {
+    return {
+      selectedDealerNumber: computed(() => store.selectedDealer()?.number ?? '10820'),
+      appVm: computed(() => buildAppVm(store.dealers(), store.languages(), store.selectedDealer(), store.selectedLanguage()))
     }
   }),
   withMethods(store => {
@@ -51,7 +58,15 @@ export const AppStore = signalStore(
           store._languageService.fetchLanguages$(),
           store._dealerService.fetchDealers$()
         ]).pipe(
-          tap(([languages, dealers]) => patchState(store, setLanguages(languages), setDealers(dealers), setBusy(false)))
+          tapResponse({
+            next: ([languages, dealers]) => {
+              patchState(store, setLanguages(languages), setDealers(dealers), setBusy(false))
+            },
+            error: err => {
+              store._notificationService.error(`${err}`)
+              patchState(store, setBusy(false))
+            }
+          })
         ))
     ))
 
@@ -74,22 +89,17 @@ export const AppStore = signalStore(
     ))
 
     return {
-      changeDealer: (dealer: Dealer) => {
-        patchState(store, changeDealer(dealer))
-      },
-      changeLanguage: (language: string) => {
-        return _fetchTranslations(language)
-      },
-      translate: (key: string) => {
-        return store._translationService.getTranslation(store.selectedLanguage(), key)
-      },
-      fetchDealers: async () => {
-        await _fetchDealers()
-      },
+      changeDealer: (dealer: Dealer) => patchState(store, changeDealer(dealer)),
+
+      changeLanguage: (language: string) => _fetchTranslations(language),
+
+      translate: (key: string): string => store._translationService.getTranslation(store.selectedLanguage(), key),
+
+      fetchDealers: async () => _fetchDealers(),
+
       fetchLanguages: () => _fetchLanguages(),
-      fetchMetadata: () => {
-        return _fetchMetadata()
-      }
+
+      fetchMetadata: () => _fetchMetadata()
     }
   }),
   withDevtools('orders-global-store'),

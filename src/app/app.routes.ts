@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router'
+import { OrdersOverviewStore } from './features/orders-overview/store/orders-overview.store'
 
 export const routes: Routes = [
   {
@@ -7,10 +8,11 @@ export const routes: Routes = [
   },
   {
     path: 'orders-overview',
-    loadComponent: () => import('./features/orders-overview/container/orders-overview.component').then(m => m.OrdersOverviewComponent)
+    loadComponent: () => import('./features/orders-overview/container/orders-overview.component').then(m => m.OrdersOverviewComponent),
+    providers: [OrdersOverviewStore]
   },
   {
-    path: 'order-details/:id',
+    path: 'order-details/:orderNumber',
     loadComponent: () => import('./features/order-details/container/order-details.component').then(m => m.OrderDetailsComponent)
   }
 ]

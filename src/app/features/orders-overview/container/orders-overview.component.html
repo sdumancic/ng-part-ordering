@@ -1,1 +1,12 @@
-<app-orders-overview-table/>
+@let vm = store.ordersOverviewVm();
+<div class="header">
+  <button class="overview-button" mat-button (click)="goHome()">Go Back</button>
+  <button class="overview-button" mat-button (click)="openNewOrderDialog()">Create New</button>
+</div>
+<app-orders-overview-table
+  [orders]="vm.orders"
+  [totalRecords]="vm.totalItems"
+  (sortingPagingChanged)="onSortingPagingChanged($event)"
+>
+
+</app-orders-overview-table>

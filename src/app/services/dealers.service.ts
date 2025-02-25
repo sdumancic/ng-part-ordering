@@ -9,7 +9,7 @@ export class DealersService {
   fetchDealers$ (): Observable<Dealer[]> {
     return of(ALL_DEALERS).pipe(
       tap(_ => console.log(`Started loading dealers`)),
-      delay(1000),
+      delay(300),
       tap(_ => console.log(`Finished loading dealers`)),
     )
   }

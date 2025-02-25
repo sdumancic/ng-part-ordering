@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core'
+import { AfterViewInit, Component, computed, EventEmitter, input, Output, ViewChild } from '@angular/core'
 import { MatProgressSpinner } from '@angular/material/progress-spinner'
 import {
   MatCell,
@@ -12,9 +12,11 @@ import {
   MatRowDef,
   MatTable
 } from '@angular/material/table'
-import { MatSort } from '@angular/material/sort'
+import { MatSort, MatSortModule } from '@angular/material/sort'
 import { MatPaginator } from '@angular/material/paginator'
-import { DatePipe } from '@angular/common'
+import { merge, startWith } from 'rxjs'
+import { PagingSortChangeEventModel } from '../../../models/paging-sort-change-event.model'
+import { OrderOverviewItemVm } from '../view-model/order-overview-item.vm'
 
 @Component({
   selector: 'app-orders-overview-table',
@@ -32,58 +34,42 @@ import { DatePipe } from '@angular/common'
     MatHeaderRow,
     MatHeaderRowDef,
     MatRowDef,
-    DatePipe
+    MatSortModule,
   ],
   templateUrl: './orders-overview-table.component.html',
   styleUrl: './orders-overview-table.component.scss'
 })
 export class OrdersOverviewTableComponent implements AfterViewInit {
 
-  displayedColumns: string[] = ['created', 'state', 'number', 'title']
-  data: any[] = []
+  readonly orders = input.required<OrderOverviewItemVm[]>()
+  readonly totalRecords = input.required<number>()
+  @Output() sortingPagingChanged = new EventEmitter<PagingSortChangeEventModel>()
 
-  resultsLength = 0
-  isLoadingResults = true
-  isRateLimitReached = false
+  readonly data = computed(() => this.orders())
+  readonly resultsLength = computed(() => this.totalRecords())
+  displayedColumns: string[] = ['orderNumber', 'orderTypeDescription', 'orderStatusDescription', 'orderDealerNumber', 'deliveryDealerNumber', 'deliveryDealerInfo', 'deliveryTypeDescription', 'invoiceDealerNumber', 'availableLimit']
+
+  isLoadingResults = false
 
   @ViewChild(MatPaginator) paginator!: MatPaginator
   @ViewChild(MatSort) sort!: MatSort
 
   ngAfterViewInit () {
 
-    // If the user changes the sort order, reset back to the first page.
-    this.sort?.sortChange.subscribe(() => (this.paginator.pageIndex = 0))
-    /*
-        merge(this.sort.sortChange, this.paginator.page)
-          .pipe(
-            startWith({}),
-            switchMap(() => {
-              this.isLoadingResults = true
-              return this.exampleDatabase!.getRepoIssues(
-                this.sort.active,
-                this.sort.direction,
-                this.paginator.pageIndex,
-              ).pipe(catchError(() => observableOf(null)))
-            }),
-            map(data => {
-              // Flip flag to show that loading has finished.
-              this.isLoadingResults = false
-              this.isRateLimitReached = data === null
+    this.sort?.sortChange.subscribe((s) => {
+      this.paginator.pageIndex = 0
+    })
+    merge(this.sort.sortChange, this.paginator.page)
+      .pipe(
+        startWith({})
+      ).subscribe(_ =>
+      this.sortingPagingChanged.emit({
+        direction: this.sort.direction,
+        active: this.sort.active,
+        page: this.paginator.pageIndex,
+        pageSize: this.paginator.pageSize
+      } as PagingSortChangeEventModel))
 
-              if (data === null) {
-                return []
-              }
-
-              // Only refresh the result length if there is new data. In case of rate
-              // limit errors, we do not want to reset the paginator to zero, as that
-              // would prevent users from re-triggering requests.
-              this.resultsLength = data.total_count
-              return data.items
-            }),
-          )
-          .subscribe(data => (this.data = data))
-          *
-     */
   }
 }
 

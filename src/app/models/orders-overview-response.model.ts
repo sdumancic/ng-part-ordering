@@ -6,8 +6,8 @@ export interface OrdersOverviewResponse {
 }
 
 export interface Metadata {
-  'pageNumber': number
-  'pageSize': number
-  'totalPages': number
-  'totalItems': number
+  pageNumber: number
+  pageSize: number
+  totalPages: number
+  totalItems: number
 }

@@ -1,0 +1,14 @@
+:host {
+  .header {
+    display: flex;
+    align-items: center;
+    height: 96px;
+    margin: 0 10px 0 10px;
+    justify-content: space-between;
+  }
+
+  .overview-button {
+    color: white;
+    background-color: black;
+  }
+}

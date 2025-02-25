@@ -1,11 +1,13 @@
+@let vm = store.appVm();
+
 <app-toolbar
-  [dealers]="store.dealers()"
-  [languages]="store.languages()"
-  [selectedDealer]="store.selectedDealer()"
-  [selectedLanguage]="store.selectedLanguage()"
+  [dealers]="vm.dealers"
+  [languages]="vm.languages"
+  [selectedDealer]="vm.selectedDealer"
+  [selectedLanguage]="vm.selectedLanguage"
   (dealerSelected)="store.changeDealer($event)"
   (languageSelected)="store.changeLanguage($event)"
-  [caption]="store.translate('caption')"
+  [caption]="store.translate('caption')!"
 ></app-toolbar>
 @if (store.isBusy()) {
   <app-busy-indicator/>
