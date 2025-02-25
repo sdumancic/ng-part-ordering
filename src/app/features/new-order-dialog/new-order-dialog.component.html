@@ -1,0 +1,11 @@
+<h2 mat-dialog-title>Create new order</h2>
+<mat-dialog-content>
+  <mat-form-field>
+    <mat-label>Dealer</mat-label>
+    <input matInput disabled [ngModel]="data.selectedDealer?.number + ' ' + data.selectedDealer?.name"/>
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-button [mat-dialog-close]="data.selectedDealer" [disabled]="!data.selectedDealer">Ok</button>
+</mat-dialog-actions>
