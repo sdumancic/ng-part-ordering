@@ -7,6 +7,7 @@ import { Router } from '@angular/router'
 import { MatDialog } from '@angular/material/dialog'
 import { NewOrderDialogComponent } from '../../new-order-dialog/new-order-dialog.component'
 import { OrdersService } from '../../../services/orders.service'
+import { OrderOverviewItemVm } from '../view-model/order-overview-item.vm'
 
 @Component({
   selector: 'app-orders-overview',
@@ -40,10 +41,13 @@ export class OrdersOverviewComponent {
       if (dealer) {
         //create new order and route to its details
         const newOrder = this.ordersService.createNewOrder(dealer)
-        console.log(newOrder)
+        alert('Order is created only in memory, so routing to newly created order wont work')
         this.router.navigate(['/order-details', newOrder.orderId])
       }
     })
   }
 
+  onShowDetails (event: OrderOverviewItemVm) {
+    this.router.navigate(['/order-details', event.orderNumber])
+  }
 }
