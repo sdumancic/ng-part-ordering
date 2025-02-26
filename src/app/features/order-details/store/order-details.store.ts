@@ -9,9 +9,11 @@ import { AppStore } from '../../../store/app.store'
 import { initialOrderDetailsSlice } from './order-details.slice'
 import { OrderPosition } from '../../../models/order-position'
 import {
+  emptyPartInformation,
   setBusy,
   setDeliveryDealer,
   setInvoiceDealer,
+  setNewPart,
   setOrderHeader,
   setOrderPositions,
   setOrderType,
@@ -20,6 +22,9 @@ import {
 import { tapResponse } from '@ngrx/operators'
 import { NotificationService } from '../../../services/notification.service'
 import { buildOrdersDetailHeaderVm } from './order-detail-header-vm.builder'
+import { buildOrdersDetailPositionsVm } from './order-detail-positions-vm.builder'
+import { PartService } from '../../../services/part.service'
+import { buildOrdersDetailAddPartVm } from './order-detail-add-part-vm.builder'
 
 export const OrderDetailStore = signalStore(
   withState(initialOrderDetailsSlice),
@@ -27,12 +32,15 @@ export const OrderDetailStore = signalStore(
     return {
       _ordersService: inject(OrdersService),
       _appStore: inject(AppStore),
-      _notificationService: inject(NotificationService)
+      _notificationService: inject(NotificationService),
+      _partService: inject(PartService)
     }
   }),
   withComputed((store) => {
     return {
       orderDetailHeaderVm: computed(() => buildOrdersDetailHeaderVm(store.orderHeader()!)),
+      orderDetailPositionsVm: computed(() => buildOrdersDetailPositionsVm(store.orderPositions()!)),
+      buildOrdersDetailAddPartVm: computed(() => buildOrdersDetailAddPartVm(store.part())),
       orderHeaderId: computed(() => store.orderHeader()?.orderId),
       selectedDealerNumber: computed(() => store._appStore.selectedDealerNumber()),
       selectedDealer: computed(() => store._appStore.selectedDealer())
@@ -59,6 +67,9 @@ export const OrderDetailStore = signalStore(
     },
     changeInvoiceDealer (id: number): void {
       patchState(store, setInvoiceDealer(id))
+    },
+    clearPart (): void {
+      patchState(store, emptyPartInformation())
     },
     fetchOrderAndPositions: rxMethod<number>(input$ => input$.pipe(
       tap(_ => patchState(store, setBusy(true))),
@@ -121,7 +132,26 @@ export const OrderDetailStore = signalStore(
               patchState(store, setBusy(false))
             }
           })
-        ))))
+        )))),
+    searchPart: rxMethod<string>(input$ => input$.pipe(
+      switchMap(partNumber => store._partService.searchPart$(partNumber)
+        .pipe(
+          tap(part => {
+            if (!part) {
+              store._notificationService.error(`Part not found: ${partNumber}`)
+            } else {
+              patchState(store, setNewPart(part))
+            }
+          })))
+    )),
+    addPartToPositions: rxMethod<void>(input$ => input$.pipe(
+      switchMap(_ => store._ordersService.addPositionToOrder$(store.part(), store.orderHeaderId())
+        .pipe(
+          tap(positions => {
+            patchState(store, setOrderPositions(positions)),
+              patchState(store, emptyPartInformation())
+          })))
+    )),
   })),
   withDevtools('order-details-store'),
 )

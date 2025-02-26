@@ -1,4 +1,6 @@
 @let vm = store.orderDetailHeaderVm();
+@let vmPos = store.orderDetailPositionsVm();
+@let vmAddPart = store.buildOrdersDetailAddPartVm();
 <div class="content">
   <app-order-header
     [order]="vm"
@@ -8,5 +10,11 @@
     (invoiceDealerChange)="onInvoiceDealerChange($event)"
     (saveHeader)="onSave()"
   ></app-order-header>
-  <app-order-positions></app-order-positions>
+  <app-order-positions
+    [positionsVm]="vmPos"
+    [newPartVm]="vmAddPart"
+    (searchPart)="onSearchPart($event)"
+    (clearPart)="onClearPart()"
+    (addPart)="onAddPart()"
+  ></app-order-positions>
 </div>

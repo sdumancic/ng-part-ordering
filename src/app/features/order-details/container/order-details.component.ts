@@ -22,7 +22,6 @@ export class OrderDetailsComponent {
       this.store.setOrderNumber(this.orderNumber())
       this.store.fetchOrderAndPositions(this.orderNumber())
     })
-
   }
 
   onOrderTypeChange (event: number) {
@@ -43,5 +42,17 @@ export class OrderDetailsComponent {
 
   onSave () {
     this.store.saveOrder()
+  }
+
+  onSearchPart (partNumber: string) {
+    this.store.searchPart(partNumber)
+  }
+
+  onClearPart () {
+    this.store.clearPart()
+  }
+
+  onAddPart () {
+    this.store.addPartToPositions()
   }
 }

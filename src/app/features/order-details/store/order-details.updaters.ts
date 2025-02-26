@@ -2,6 +2,7 @@ import { PartialStateUpdater } from '@ngrx/signals'
 import { PartOrder } from '../../../models/part-order.model'
 import { OrderDetailsSlice } from './order-details.slice'
 import { OrderPosition } from '../../../models/order-position'
+import { Part } from '../../../models/part.model'
 
 export function setBusy (isBusy: boolean): PartialStateUpdater<OrderDetailsSlice> {
   return _ => ({ isBusy })
@@ -56,3 +57,12 @@ export function setInvoiceDealer (invoiceDealerId: number): PartialStateUpdater<
     }
   })
 }
+
+export function setNewPart (part: Part): PartialStateUpdater<OrderDetailsSlice> {
+  return _ => ({ part })
+}
+
+export function emptyPartInformation (): PartialStateUpdater<OrderDetailsSlice> {
+  return _ => ({ part: null })
+}
+

@@ -8,6 +8,7 @@ import { PartOrder } from '../models/part-order.model'
 import { Dealer } from '../models/dealer.model'
 import { ALL_POSITIONS } from '../data/positions'
 import { OrderPosition } from '../models/order-position'
+import { Part } from '../models/part.model'
 
 @Injectable({ providedIn: 'root' })
 export class OrdersService {
@@ -110,6 +111,31 @@ export class OrdersService {
     return of({ updatedOrder: updatedOrder, updatedPositions: [...ALL_POSITIONS] }).pipe(delay(100))
   }
 
+  addPositionToOrder$ (newPart: Part | null, orderId: number | undefined): Observable<OrderPosition[]> {
+    if (newPart == null || orderId == undefined) {
+      return of(ALL_POSITIONS.filter(pos => pos.orderId == orderId))
+    }
+    const newPosition: OrderPosition = {
+      posId: this.findMaxPosId(ALL_POSITIONS) + 1,
+      orderId: orderId,
+      partId: newPart.partId,
+      partNo: newPart.partNo,
+      partFranchiseCode: newPart.partFranchiseCode,
+      partDescription: newPart.partDescription,
+      amountOrdered: 1,
+      amountDelivered: 1,
+      partPrices: {
+        gross: newPart.grossPricePart,
+        netPricePart: newPart.netPricePart,
+        surcharge: 0,
+        discountCode: '',
+        discountRate: 0
+      }
+    }
+    ALL_POSITIONS.push(newPosition)
+    return of(ALL_POSITIONS.filter(pos => pos.orderId == orderId))
+  }
+
   private sortOrders (orders: PartOrder[], active: keyof PartOrder, direction: SortDirection): PartOrder[] {
     return orders.sort((a, b) => {
       const valueA = a[active]
@@ -137,4 +163,8 @@ export class OrdersService {
     return orders.reduce((max, order) => Math.max(max, order.orderNumber), orders[0].orderNumber)
   }
 
+  private findMaxPosId (positions: OrderPosition[]): number {
+    if (positions.length === 0) return 0
+    return positions.reduce((max, position) => Math.max(max, position.posId), positions[0].posId)
+  }
 }

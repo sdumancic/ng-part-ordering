@@ -3,5 +3,78 @@
     <mat-card-title>Order Positions</mat-card-title>
   </mat-card-header>
   <mat-card-content>
+
+    <div class="example-container mat-elevation-z8">
+
+      <div class="example-table-container">
+        <table
+          mat-table [dataSource]="data()" class="example-table"
+        >
+          <ng-container matColumnDef="partFranchiseCode">
+            <th mat-header-cell *matHeaderCellDef>FC</th>
+            <td mat-cell *matCellDef="let row">{{ row.partFranchiseCode }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="partNo">
+            <th mat-header-cell *matHeaderCellDef>Part number</th>
+            <td mat-cell *matCellDef="let row">{{ row.partNo }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="partDescription">
+            <th mat-header-cell *matHeaderCellDef>Description</th>
+            <td mat-cell *matCellDef="let row">{{ row.partDescription }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="amountOrdered">
+            <th mat-header-cell *matHeaderCellDef>Ordered</th>
+            <td mat-cell *matCellDef="let row">{{ row.amountOrdered }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="amountDelivered">
+            <th mat-header-cell *matHeaderCellDef>Delivered</th>
+            <td mat-cell *matCellDef="let row">{{ row.amountDelivered }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="gross">
+            <th mat-header-cell *matHeaderCellDef>Gross</th>
+            <td mat-cell *matCellDef="let row">{{ row.gross }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="netPricePart">
+            <th mat-header-cell *matHeaderCellDef>Net</th>
+            <td mat-cell *matCellDef="let row">{{ row.netPricePart }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="discountCode">
+            <th mat-header-cell *matHeaderCellDef>Discount Code</th>
+            <td mat-cell *matCellDef="let row">{{ row.discountCode }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="discountRate">
+            <th mat-header-cell *matHeaderCellDef>Discount Rate</th>
+            <td mat-cell *matCellDef="let row">{{ row.discountRate }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+
+    </div>
+    <div class="add-part-section">
+      <mat-form-field appearance="outline">
+        <mat-label>Part Number</mat-label>
+        <input matInput [(ngModel)]="newPartNumber" (keydown)="onKeydown($event)"/>
+      </mat-form-field>
+      <mat-form-field appearance="outline" disabled class="new-part-description">
+        <mat-label>Part Description</mat-label>
+        <input matInput [(ngModel)]="newPartDescription" readonly disabled/>
+      </mat-form-field>
+      <button mat-raised-button color="primary" (click)="onAddPart()" [disabled]="!newPartVm()?.partDescription">Add
+        Part
+      </button>
+    </div>
+
+
   </mat-card-content>
 </mat-card>
