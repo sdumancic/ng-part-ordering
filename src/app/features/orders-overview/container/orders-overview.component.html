@@ -1,7 +1,10 @@
 @let vm = store.ordersOverviewVm();
 <div class="header">
-  <button class="overview-button" mat-button (click)="goHome()">Go Back</button>
-  <button class="overview-button" mat-button (click)="openNewOrderDialog()">Create New</button>
+  <button
+    mat-stroked-button (click)="goHome()"
+  >Go back
+  </button>
+  <button mat-stroked-button (click)="openNewOrderDialog()">Create New</button>
 </div>
 <app-orders-overview-table
   [orders]="vm.orders"

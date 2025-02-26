@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core'
-import { delay, map, Observable, of } from 'rxjs'
+import { delay, map, Observable, of, throwError } from 'rxjs'
 import { OrdersOverviewResponse } from '../models/orders-overview-response.model'
 import { ALL_ORDERS } from '../data/orders'
 import { PaginateUtil } from '../utils/paginate.util'
 import { SortDirection } from '@angular/material/sort'
 import { PartOrder } from '../models/part-order.model'
 import { Dealer } from '../models/dealer.model'
+import { ALL_POSITIONS } from '../data/positions'
+import { OrderPosition } from '../models/order-position'
 
 @Injectable({ providedIn: 'root' })
 export class OrdersService {
@@ -38,12 +40,18 @@ export class OrdersService {
     )
   }
 
-  fetchOrder$ (orderNumber: number) {
+  fetchOrder$ (orderNumber: number): Observable<PartOrder> {
+    console.log('fetchOrder$ ', orderNumber)
     const index = ALL_ORDERS.findIndex(order => order.orderNumber === orderNumber)
     if (index === -1) {
       throw new Error(`Order with number ${orderNumber} was not found`)
     }
     return of(ALL_ORDERS[index]).pipe(delay(100))
+  }
+
+  fetchPositions$ (orderId: number): Observable<OrderPosition[]> {
+    console.log('fetchPositions$ ', orderId)
+    return of(ALL_POSITIONS.filter(order => order.orderId === orderId))
   }
 
   createNewOrder (dealer: Dealer): PartOrder {
@@ -75,6 +83,31 @@ export class OrdersService {
       availableLimit: 10000,
       text: null
     }
+  }
+
+  saveOrder$ (header: PartOrder, orderPositions: OrderPosition[]): Observable<{
+    updatedOrder: PartOrder,
+    updatedPositions: OrderPosition[]
+  }> {
+
+    const index = ALL_ORDERS.findIndex(order => order.orderId === header.orderId)
+    if (index === -1) {
+      return throwError(() => `Order with id ${header.orderId} was not found`)
+    }
+    console.log('found order', ALL_ORDERS[index])
+    const updatedOrder = { ...ALL_ORDERS[index], ...header }
+    ALL_ORDERS[index] = updatedOrder
+
+    orderPositions.forEach(position => {
+      const posIndex = ALL_POSITIONS.findIndex(pos => pos.orderId === position.orderId && pos.posId === position.posId)
+      if (posIndex == -1) {
+        ALL_POSITIONS.push(position)
+      } else {
+        ALL_POSITIONS[posIndex] = position
+      }
+    })
+
+    return of({ updatedOrder: updatedOrder, updatedPositions: [...ALL_POSITIONS] }).pipe(delay(100))
   }
 
   private sortOrders (orders: PartOrder[], active: keyof PartOrder, direction: SortDirection): PartOrder[] {

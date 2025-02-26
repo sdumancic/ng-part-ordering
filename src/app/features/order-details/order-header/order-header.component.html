@@ -1,0 +1,114 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Order Header</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form #orderForm="ngForm">
+      <mat-grid-list cols="2" rowHeight="100px">
+
+        <!-- Order Number -->
+        <mat-grid-tile>
+          <mat-form-field appearance="outline">
+            <mat-label>Order Number</mat-label>
+            <input matInput type="number" [ngModel]="order().orderNumber" name="orderNumber" readonly>
+          </mat-form-field>
+        </mat-grid-tile>
+
+        <!-- Order Type -->
+        <mat-grid-tile>
+          <mat-form-field appearance="outline">
+            <mat-label>Order Type</mat-label>
+            <mat-select
+              [ngModel]="order().orderTypeCode" name="orderTypeCode"
+              (selectionChange)="orderTypeChange.emit($event.value)"
+            >
+              <mat-option *ngFor="let type of orderTypes" [value]="type.code">
+                {{ type.description }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </mat-grid-tile>
+
+        <!-- Order Dealer -->
+        <mat-grid-tile>
+          <mat-form-field appearance="outline">
+            <mat-label>Order Dealer</mat-label>
+            <mat-select [ngModel]="order().orderDealerId" name="orderDealerId">
+              <mat-option *ngFor="let dealer of orderDealers" [value]="dealer.id">
+                {{ dealer.number }} - {{ dealer.info }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </mat-grid-tile>
+
+        <!-- Order Status -->
+        <mat-grid-tile>
+          <mat-form-field appearance="outline">
+            <mat-label>Order Status</mat-label>
+            <mat-select
+              [ngModel]="order().orderStatusCode" name="orderStatusCode"
+              (selectionChange)="orderStatusChange.emit($event.value)"
+            >
+              <mat-option *ngFor="let status of orderStatuses" [value]="status.code">
+                {{ status.description }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </mat-grid-tile>
+
+        <!-- Created On -->
+        <mat-grid-tile>
+          <mat-form-field appearance="outline">
+            <mat-label>Created On</mat-label>
+            <input matInput type="text" [ngModel]="order().createdOn" name="createdOn" readonly>
+          </mat-form-field>
+        </mat-grid-tile>
+
+        <!-- Total Amount -->
+        <mat-grid-tile>
+          <mat-form-field appearance="outline">
+            <mat-label>Total Amount</mat-label>
+            <input matInput type="number" [ngModel]="order().totalAmount" name="totalAmount" readonly>
+          </mat-form-field>
+        </mat-grid-tile>
+
+        <!-- Delivery Dealer -->
+        <mat-grid-tile>
+          <mat-form-field appearance="outline">
+            <mat-label>Delivery Dealer</mat-label>
+            <mat-select
+              [ngModel]="order().deliveryDealerId" name="deliveryDealerId"
+              (selectionChange)="deliveryDealerChange.emit($event.value)"
+            >
+              <mat-option *ngFor="let dealer of deliveryDealers" [value]="dealer.id">
+                {{ dealer.number }} - {{ dealer.info }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </mat-grid-tile>
+
+        <!-- Invoice Dealer -->
+        <mat-grid-tile>
+          <mat-form-field appearance="outline">
+            <mat-label>Invoice Dealer</mat-label>
+            <mat-select
+              [ngModel]="order().invoiceDealerId" name="invoiceDealerId"
+              (selectionChange)="invoiceDealerChange.emit($event.value)"
+            >
+              <mat-option *ngFor="let dealer of invoiceDealers" [value]="dealer.id">
+                {{ dealer.number }} - {{ dealer.info }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </mat-grid-tile>
+
+      </mat-grid-list>
+
+      <!-- Submit Button -->
+      <button mat-raised-button color="primary" (click)="saveHeader.emit()" [disabled]="!orderForm.valid">
+        Save (in memory)
+      </button>
+    </form>
+
+  </mat-card-content>
+</mat-card>

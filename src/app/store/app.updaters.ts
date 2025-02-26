@@ -20,13 +20,13 @@ export function setTranslations (translations: Record<string, string>): PartialS
 }
 
 export function changeDealer (dealer: Dealer): PartialStateUpdater<AppSlice> {
-  return state => {
+  return _ => {
     return { selectedDealer: dealer }
   }
 }
 
 export function changeLanguage (language: string): PartialStateUpdater<AppSlice> {
-  return state => {
+  return _ => {
     return { selectedLanguage: language }
   }
 }

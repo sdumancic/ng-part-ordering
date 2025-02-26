@@ -56,7 +56,7 @@ export class OrdersOverviewTableComponent implements AfterViewInit {
 
   ngAfterViewInit () {
 
-    this.sort?.sortChange.subscribe((s) => {
+    this.sort?.sortChange.subscribe((_) => {
       this.paginator.pageIndex = 0
     })
     merge(this.sort.sortChange, this.paginator.page)

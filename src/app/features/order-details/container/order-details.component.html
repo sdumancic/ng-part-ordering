@@ -1,1 +1,12 @@
-<p>order-details works!</p>
+@let vm = store.orderDetailHeaderVm();
+<div class="content">
+  <app-order-header
+    [order]="vm"
+    (orderTypeChange)="onOrderTypeChange($event)"
+    (orderStatusChange)="onOrderStatusChange($event)"
+    (deliveryDealerChange)="onDeliveryDealerChange($event)"
+    (invoiceDealerChange)="onInvoiceDealerChange($event)"
+    (saveHeader)="onSave()"
+  ></app-order-header>
+  <app-order-positions></app-order-positions>
+</div>
