@@ -16,6 +16,10 @@ export function setOrderPositions (positions: OrderPosition[]): PartialStateUpda
   return _ => ({ orderPositions: positions })
 }
 
+export function setOrderNumber (orderNumber: number): PartialStateUpdater<OrderDetailsSlice> {
+  return _ => ({ orderNumber: orderNumber })
+}
+
 export function setOrderType (orderType: number): PartialStateUpdater<OrderDetailsSlice> {
   return state => ({
     orderHeader: {

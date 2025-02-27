@@ -4,7 +4,8 @@ import { computed, inject } from '@angular/core'
 import { DealersService } from '../services/dealers.service'
 import { LanguageService } from '../services/language.service'
 import { firstValueFrom, forkJoin, switchMap, tap } from 'rxjs'
-import { changeDealer, changeLanguage, setBusy, setDealers, setLanguages, setTranslations } from './app.updaters'
+//import { changeDealer, changeLanguage, setBusy, setDealers, setLanguages, setTranslations } from './app.updaters'
+import * as updaters from './app.updaters'
 import { Dealer } from '../models/dealer.model'
 import { withDevtools } from '@angular-architects/ngrx-toolkit'
 import { rxMethod } from '@ngrx/signals/rxjs-interop'
@@ -37,21 +38,21 @@ export const AppStore = signalStore(
   withMethods(store => {
     const _fetchDealers = async () => {
       console.log('fetching dealers')
-      patchState(store, setBusy(true))
+      patchState(store, updaters.setBusy(true))
       const dealers = await firstValueFrom(store._dealerService.fetchDealers$())
-      patchState(store, setBusy(false), setDealers(dealers))
+      patchState(store, updaters.setBusy(false), updaters.setDealers(dealers))
     }
     const _fetchLanguages = rxMethod<void>(input$ => input$.pipe(
       tap(_ => console.log('fetching languages')),
-      tap(_ => patchState(store, setBusy(true))),
+      tap(_ => patchState(store, updaters.setBusy(true))),
       switchMap(_ => store._languageService.fetchLanguages$()
-        .pipe(tap(langs => patchState(store, setLanguages(langs), setBusy(false)))
+        .pipe(tap(langs => patchState(store, updaters.setLanguages(langs), updaters.setBusy(false)))
         ))))
 
     const _fetchMetadata = rxMethod<void>(input$ => input$.pipe(
       tap(_ => {
         console.log('fetching metadata')
-        patchState(store, setBusy(true))
+        patchState(store, updaters.setBusy(true))
       }),
       switchMap(_ =>
         forkJoin([
@@ -60,11 +61,11 @@ export const AppStore = signalStore(
         ]).pipe(
           tapResponse({
             next: ([languages, dealers]) => {
-              patchState(store, setLanguages(languages), setDealers(dealers), setBusy(false))
+              patchState(store, updaters.setLanguages(languages), updaters.setDealers(dealers), updaters.setBusy(false))
             },
             error: err => {
               store._notificationService.error(`${err}`)
-              patchState(store, setBusy(false))
+              patchState(store, updaters.setBusy(false))
             }
           })
         ))
@@ -72,24 +73,24 @@ export const AppStore = signalStore(
 
     const _fetchTranslations = rxMethod<string>(language$ => language$.pipe(
       tap(language => {
-        patchState(store, setBusy(true))
+        patchState(store, updaters.setBusy(true))
         console.log('changing language and fetching translations for ', language)
-        patchState(store, changeLanguage(language))
+        patchState(store, updaters.changeLanguage(language))
       }),
       switchMap(language => store._translationService.fetchTranslations$(language)
         .pipe(
           tapResponse({
-            next: (translations) => patchState(store, setTranslations(translations), setBusy(false)),
+            next: (translations) => patchState(store, updaters.setTranslations(translations), updaters.setBusy(false)),
             error: (err) => {
               store._notificationService.error(`${err}`)
-              patchState(store, setBusy(false))
+              patchState(store, updaters.setBusy(false))
             }
           })
         ))
     ))
 
     return {
-      changeDealer: (dealer: Dealer) => patchState(store, changeDealer(dealer)),
+      changeDealer: (dealer: Dealer) => patchState(store, updaters.changeDealer(dealer)),
 
       changeLanguage: (language: string) => _fetchTranslations(language),
 

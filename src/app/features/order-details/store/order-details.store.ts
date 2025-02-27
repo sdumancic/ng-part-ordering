@@ -8,23 +8,13 @@ import { computed, inject } from '@angular/core'
 import { AppStore } from '../../../store/app.store'
 import { initialOrderDetailsSlice } from './order-details.slice'
 import { OrderPosition } from '../../../models/order-position'
-import {
-  emptyPartInformation,
-  setBusy,
-  setDeliveryDealer,
-  setInvoiceDealer,
-  setNewPart,
-  setOrderHeader,
-  setOrderPositions,
-  setOrderType,
-  setStatus
-} from './order-details.updaters'
 import { tapResponse } from '@ngrx/operators'
 import { NotificationService } from '../../../services/notification.service'
 import { buildOrdersDetailHeaderVm } from './order-detail-header-vm.builder'
 import { buildOrdersDetailPositionsVm } from './order-detail-positions-vm.builder'
 import { PartService } from '../../../services/part.service'
 import { buildOrdersDetailAddPartVm } from './order-detail-add-part-vm.builder'
+import * as updaters from './order-details.updaters'
 
 export const OrderDetailStore = signalStore(
   withState(initialOrderDetailsSlice),
@@ -48,42 +38,42 @@ export const OrderDetailStore = signalStore(
   }),
   withMethods((store) => ({
     setOrderNumber (orderNumber: number): void {
-      patchState(store, { orderNumber })
+      patchState(store, updaters.setOrderNumber(orderNumber))
     },
     setOrderHeader (orderHeader: PartOrder): void {
-      patchState(store, { orderHeader })
+      patchState(store, updaters.setOrderHeader(orderHeader))
     },
     setOrderPositions (orderPositions: OrderPosition[]): void {
-      patchState(store, { orderPositions })
+      patchState(store, updaters.setOrderPositions(orderPositions))
     },
     changeOrderType (orderType: number): void {
-      patchState(store, setOrderType(orderType))
+      patchState(store, updaters.setOrderType(orderType))
     },
     changeStatus (statusCode: string): void {
-      patchState(store, setStatus(statusCode))
+      patchState(store, updaters.setStatus(statusCode))
     },
     changeDeliveryDealer (id: number): void {
-      patchState(store, setDeliveryDealer(id))
+      patchState(store, updaters.setDeliveryDealer(id))
     },
     changeInvoiceDealer (id: number): void {
-      patchState(store, setInvoiceDealer(id))
+      patchState(store, updaters.setInvoiceDealer(id))
     },
     clearPart (): void {
-      patchState(store, emptyPartInformation())
+      patchState(store, updaters.emptyPartInformation())
     },
     fetchOrderAndPositions: rxMethod<number>(input$ => input$.pipe(
-      tap(_ => patchState(store, setBusy(true))),
+      tap(_ => patchState(store, updaters.setBusy(true))),
       //filter(_ => store._appStore.selectedDealerNumber() !== undefined),
       filter(_ => store.orderNumber !== null),
       switchMap(_ => store._ordersService.fetchOrder$(store.orderNumber()!)
         .pipe(
           tapResponse({
             next: (order) => {
-              patchState(store, setOrderHeader(order))
+              patchState(store, updaters.setOrderHeader(order))
             },
             error: err => {
               store._notificationService.error(`${err}`)
-              patchState(store, setBusy(false))
+              patchState(store, updaters.setBusy(false))
             }
           })
         )),
@@ -91,45 +81,45 @@ export const OrderDetailStore = signalStore(
       switchMap(_ => store._ordersService.fetchPositions$(store.orderHeaderId()!).pipe(
         tapResponse({
           next: (positions) => {
-            patchState(store, setOrderPositions(positions), setBusy(false))
+            patchState(store, updaters.setOrderPositions(positions), updaters.setBusy(false))
           },
           error: err => {
             store._notificationService.error(`${err}`)
-            patchState(store, setBusy(false))
+            patchState(store, updaters.setBusy(false))
           }
         })
       ))
     )),
     fetchPositions: rxMethod<number>(input$ => input$.pipe(
-      tap(_ => patchState(store, setBusy(true))),
+      tap(_ => patchState(store, updaters.setBusy(true))),
       filter(_ => store.orderHeaderId !== undefined),
       switchMap(orderId => store._ordersService.fetchPositions$(orderId)
         .pipe(
           tapResponse({
             next: (positions) => {
-              patchState(store, setOrderPositions(positions), setBusy(false))
+              patchState(store, updaters.setOrderPositions(positions), updaters.setBusy(false))
             },
             error: err => {
               store._notificationService.error(`${err}`)
-              patchState(store, setBusy(false))
+              patchState(store, updaters.setBusy(false))
             }
           })
         )))),
     saveOrder: rxMethod<void>(input$ => input$.pipe(
-      tap(_ => patchState(store, setBusy(true))),
+      tap(_ => patchState(store, updaters.setBusy(true))),
       switchMap(response => store._ordersService.saveOrder$(store.orderHeader()!, store.orderPositions())
         .pipe(
           tapResponse({
             next: response => {
               store._notificationService.success('Order saved')
               patchState(store,
-                setOrderHeader(response.updatedOrder),
-                setOrderPositions(response.updatedPositions),
-                setBusy(false))
+                updaters.setOrderHeader(response.updatedOrder),
+                updaters.setOrderPositions(response.updatedPositions),
+                updaters.setBusy(false))
             },
             error: err => {
               store._notificationService.error(`${err}`)
-              patchState(store, setBusy(false))
+              patchState(store, updaters.setBusy(false))
             }
           })
         )))),
@@ -140,7 +130,7 @@ export const OrderDetailStore = signalStore(
             if (!part) {
               store._notificationService.error(`Part not found: ${partNumber}`)
             } else {
-              patchState(store, setNewPart(part))
+              patchState(store, updaters.setNewPart(part))
             }
           })))
     )),
@@ -148,8 +138,8 @@ export const OrderDetailStore = signalStore(
       switchMap(_ => store._ordersService.addPositionToOrder$(store.part(), store.orderHeaderId())
         .pipe(
           tap(positions => {
-            patchState(store, setOrderPositions(positions)),
-              patchState(store, emptyPartInformation())
+            patchState(store, updaters.setOrderPositions(positions)),
+              patchState(store, updaters.emptyPartInformation())
           })))
     )),
   })),
